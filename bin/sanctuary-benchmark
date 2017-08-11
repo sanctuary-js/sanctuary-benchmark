@@ -1,0 +1,87 @@
+#!/usr/bin/env node
+
+'use strict';
+
+var fs = require('fs');
+
+var dir = require('path').resolve(process.cwd(), 'bench');
+
+var help = 'Create a bench directory in this project to get started\n';
+
+function printHelp() {
+  process.stdout.write(help);
+  process.exit(0);
+}
+
+if (!fs.existsSync(dir)) printHelp();
+
+var benchmarks = fs.readdirSync(dir).filter(function(file) {
+  return file.slice(-3) === '.js';
+}).map(function(file) {
+  return file.slice(0, -3);
+});
+
+help = 'There are no benchmarks in the bench directory\n'
+     + '\n'
+     + '  To create a benchmark, add a JavaScript file to the bench directory\n'
+     + '  and define benchmarks as described by the sanctuary-benchmark README.\n'
+     + '\n'
+     + 'Example\n'
+     + '\n'
+     + '  module.exports = require(\'sanctuary-benchmark\')(\n'
+     + '    require(\'ramda\'),\n'
+     + '    require(\'sanctuary\'),\n'
+     + '    { left: \'Ramda\', right: \'Sanctuary\' },\n'
+     + '    { map: (lib) => lib.map(x => x + 1, [1, 2, 3]) }\n'
+     + '  );\n';
+
+if (benchmarks.length === 0) printHelp();
+
+help = 'Usage\n'
+     + '  $ sanctuary-benchmark [options]\n'
+     + '\n'
+     + 'Options\n'
+     + '  --benchmark <name>                 The name of the benchmark file to run\n'
+     + '  --colors, --no-colors              Enable or disable command line colors\n'
+     + '  --help                             Print help and do nothing else\n'
+     + '  --left-header <text>               Header describing the library on the left\n'
+     + '  --match <glob>                     Match suite names by given glob\n'
+     + '  --right-header <text>              Header describing the library on the right\n'
+     + '  --significant-difference <number>  Change required for highlight in results\n'
+     + '\n'
+     + 'Available benchmarks\n'
+     + '  ' + benchmarks[0] + ' (default)\n'
+     + '  ' + benchmarks.slice(1).join('\n  ') + '\n';
+
+var argv = process.argv.slice(2);
+
+if (argv.indexOf('--help') >= 0) printHelp();
+
+var defaults = {
+  benchmark: benchmarks[0]
+};
+
+var options = argv.reduce(function(options, x, i, xs) { return {
+  benchmark:             x === '--benchmark'
+                         ? benchmarks.indexOf(xs[i + 1]) < 0 ? printHelp() : String(xs[i + 1])
+                         : options.benchmark,
+  colors:                x === '--colors'
+                         ? true : x === '--no-colors' ? false
+                         : options.colors,
+  leftHeader:            x === '--left-header'
+                         ? String(xs[i + 1])
+                         : options.leftHeader,
+  match:                 x === '--match'
+                         ? String(xs[i + 1])
+                         : options.match,
+  rightHeader:           x === '--right-header'
+                         ? String(xs[i + 1])
+                         : options.rightHeader,
+  significantDifference: x === '--significant-difference'
+                         ? Number(xs[i + 1])
+                         : options.significantDifference,
+}; }, defaults);
+
+process.stdout.write('Running benchmarks: ' + options.benchmark + '...\n\n');
+
+require(dir + '/' + options.benchmark)(options);
