@@ -1,7 +1,7 @@
 {
   "name": "sanctuary-benchmark",
   "description": "Basis for easy benchmarking and sharing of the results",
-  "version": "0.0.0",
+  "version": "1.0.0",
   "scripts": {
     "doctest": "sanctuary-doctest",
     "lint": "sanctuary-lint",
