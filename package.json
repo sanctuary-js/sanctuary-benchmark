@@ -28,7 +28,7 @@
   },
   "devDependencies": {
     "intercept-stdout": "0.1.x",
-    "sanctuary-scripts": "1.1.x",
+    "sanctuary-scripts": "1.2.x",
     "sanctuary-type-classes": "6.0.x"
   }
 }
