@@ -1,0 +1,6 @@
+#!/usr/bin/env bash
+set -euf -o pipefail
+
+if [[ "${CI-false}" != true ]] ; then
+  node_modules/.bin/sanctuary-test "$@"
+fi
