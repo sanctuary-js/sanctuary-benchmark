@@ -4,5 +4,17 @@
   "env": {"node": true},
   "rules": {
     "indent": ["off"]
-  }
+  },
+  "overrides": [
+    {
+      "files": ["*.md"],
+      "plugins": ["markdown"],
+      "env": {"es6": true},
+      "rules": {
+        "comma-dangle": ["error", "always-multiline"],
+        "func-style": ["error", "declaration", {"allowArrowFunctions": true}],
+        "strict": ["off"]
+      }
+    }
+  ]
 }
