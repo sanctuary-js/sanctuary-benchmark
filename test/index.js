@@ -3,6 +3,7 @@
 var assert = require('assert');
 
 var intercept = require('intercept-stdout');
+var show = require('sanctuary-show');
 var Z = require('sanctuary-type-classes');
 
 var createRunner = require('..');
@@ -10,7 +11,7 @@ var createRunner = require('..');
 
 function eq(actual, expected) {
   assert.strictEqual(arguments.length, eq.length);
-  assert.strictEqual(Z.toString(actual), Z.toString(expected));
+  assert.strictEqual(show(actual), show(expected));
   assert.strictEqual(Z.equals(actual, expected), true);
 }
 
