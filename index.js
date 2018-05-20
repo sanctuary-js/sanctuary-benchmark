@@ -10,29 +10,29 @@
 //. Create a file in the bench directory, for example `old-vs-new.js`:
 //.
 //. ```javascript
-//. const sb = require('sanctuary-benchmark');
+//. const sb = require ('sanctuary-benchmark');
 //.
 //. // Imagine these are libs. Normally they would be require()'d.
-//. const oldVersion = (f, xs) => xs.map(f);
+//. const oldVersion = (f, xs) => xs.map (f);
 //. const newVersion = (f, xs) => {
 //.   const len = xs.length;
-//.   const out = new Array(len);
-//.   for (let idx = 0; idx < len; idx += 1) out[idx] = f(xs[idx]);
+//.   const out = new Array (len);
+//.   for (let idx = 0; idx < len; idx += 1) out[idx] = f (xs[idx]);
 //.   return out;
 //. };
 //.
-//. const small = Array.from({length: 1}, (_, i) => i);
-//. const large = Array.from({length: 1000}, (_, i) => i);
+//. const small = Array.from ({length: 1}, (_, i) => i);
+//. const large = Array.from ({length: 1000}, (_, i) => i);
 //.
-//. module.exports = sb(oldVersion, newVersion, {}, {
-//.   'map/small': [{}, map => map(x => x + 1, small)],
-//.   'map/large': [{}, map => map(x => x + 1, large)],
+//. module.exports = sb (oldVersion, newVersion, {}, {
+//.   'map/small': [{}, map => map (x => x + 1, small)],
+//.   'map/large': [{}, map => map (x => x + 1, large)],
 //. });
 //. ```
 //.
 //. Run the sanctuary-benchmark command. Pass `--help` for options.
 //.
-//. ```sh
+//. ```console
 //. $ ./node_modules/.bin/sanctuary-benchmark
 //. ```
 //.
@@ -58,16 +58,17 @@
 //. - `α`: Wheter the difference is significant. Possible values are "✓" for
 //.   an increase or "✗" for a decrease. Nothing will be rendered if the
 //.   difference was insignificant.
+
 'use strict';
 
-var Suite = require('benchmark').Suite;
-var Table = require('cli-table2');
-var micromatch = require('micromatch');
+var Suite = (require ('benchmark')).Suite;
+var Table = require ('cli-table2');
+var micromatch = require ('micromatch');
 
 
 //       formatPct :: (Boolean, Number) -> String
 function formatPct(sign, pct) {
-  var rendered = (sign ? pct : Math.abs(pct)).toLocaleString('en', {
+  var rendered = (sign ? pct : Math.abs (pct)).toLocaleString ('en', {
     minimumIntegerDigits: 3,
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
@@ -78,14 +79,14 @@ function formatPct(sign, pct) {
 
 //       format :: BenchmarkResult -> String
 function format(res) {
-  return res.hz.toLocaleString('en', {maximumFractionDigits: 0}) + ' Hz '
-       + '±' + res.stats.rme.toFixed(2) + '% '
-       + '(n ' + String(res.stats.sample.length) + ')';
+  return res.hz.toLocaleString ('en', {maximumFractionDigits: 0}) + ' Hz '
+       + '±' + res.stats.rme.toFixed (2) + '% '
+       + '(n ' + String (res.stats.sample.length) + ')';
 }
 
 //       get :: (String, a, Any) -> a
 function get(key, fallback, x) {
-  var o = Object(x);
+  var o = Object (x);
   return typeof o[key] === typeof fallback ? o[key] : fallback;
 }
 
@@ -106,7 +107,7 @@ function red(s) {
 
 //       repeat :: (Number, String) -> String
 function repeat(n, s) {
-  return new Array(n + 1).join(s);
+  return (new Array (n + 1)).join (s);
 }
 
 //. ## API Documentation
@@ -163,35 +164,35 @@ function repeat(n, s) {
 //. - `significantDifference` (`0.1`): The resulting difference (between 0
 //.   and 1) required for the output table to draw attention to these results.
 module.exports = function benchmark(leftLib, rightLib, options, specs) {
-  var _callback = get('callback', function() {}, options);
-  var _colors = get('colors', true, options);
-  var _config = get('config', {}, options);
-  var _leftHeader = get('leftHeader', 'left', options);
-  var _match = get('match', '**', options);
-  var _rightHeader = get('rightHeader', 'right', options);
-  var _significantDifference = get('significantDifference', 0.1, options);
+  var _callback = get ('callback', function() {}, options);
+  var _colors = get ('colors', true, options);
+  var _config = get ('config', {}, options);
+  var _leftHeader = get ('leftHeader', 'left', options);
+  var _match = get ('match', '**', options);
+  var _rightHeader = get ('rightHeader', 'right', options);
+  var _significantDifference = get ('significantDifference', 0.1, options);
 
   return function runBenchmarks(overrides) {
-    var callback = get('callback', _callback, overrides);
-    var colors = get('colors', _colors, overrides);
-    var config = get('config', _config, overrides);
-    var leftHeader = get('leftHeader', _leftHeader, overrides);
-    var match = get('match', _match, overrides);
-    var rightHeader = get('rightHeader', _rightHeader, overrides);
-    var significantDifference = get('significantDifference',
-                                    _significantDifference,
-                                    overrides);
+    var callback = get ('callback', _callback, overrides);
+    var colors = get ('colors', _colors, overrides);
+    var config = get ('config', _config, overrides);
+    var leftHeader = get ('leftHeader', _leftHeader, overrides);
+    var match = get ('match', _match, overrides);
+    var rightHeader = get ('rightHeader', _rightHeader, overrides);
+    var significantDifference = get ('significantDifference',
+                                     _significantDifference,
+                                     overrides);
 
-    var table = new Table({
+    var table = new Table ({
       head: ['suite', leftHeader, rightHeader, 'diff', 'change', 'α'],
       style: colors ? {} : {border: [], head: []}
     });
 
-    var keys = Object.keys(specs).filter(micromatch.matcher(match));
+    var keys = (Object.keys (specs)).filter (micromatch.matcher (match));
 
     if (keys.length === 0) {
-      process.stdout.write('No benchmarks matched\n');
-      callback();
+      process.stdout.write ('No benchmarks matched\n');
+      callback ();
       return;
     }
 
@@ -199,33 +200,35 @@ module.exports = function benchmark(leftLib, rightLib, options, specs) {
 
     function runSpec(i) {
       var name = keys[i];
-      var output = '# ' + String(i + 1) +
-                   '/' + String(keys.length) +
+      var output = '# ' + String (i + 1) +
+                   '/' + String (keys.length) +
                    ': ' +  name;
 
-      var padding = process.stdout.getWindowSize()[0] - output.length;
+      var padding = (process.stdout.getWindowSize ())[0] - output.length;
 
-      process.stdout.write(output + repeat(Math.max(padding, 0), ' ') + '\r');
+      process.stdout.write (
+        output + repeat (Math.max (padding, 0), ' ') + '\r'
+      );
 
-      var suite = new Suite(name);
+      var suite = new Suite (name);
       var spec = specs[name];
       var left = spec[1];
       var right = spec[spec.length - 1];
 
-      suite.add('left', Object.assign({}, config, spec[0], {
-        fn: function() { left(leftLib, arguments); }
+      suite.add ('left', Object.assign ({}, config, spec[0], {
+        fn: function() { left (leftLib, arguments); }
       }));
 
-      suite.add('right', Object.assign({}, config, spec[0], {
-        fn: function() { right(rightLib, arguments); }
+      suite.add ('right', Object.assign ({}, config, spec[0], {
+        fn: function() { right (rightLib, arguments); }
       }));
 
-      suite.on('complete', function() {
+      suite.on ('complete', function() {
         var oldRes = this[0], newRes = this[1];
         var change = (newRes.hz - oldRes.hz) / oldRes.hz;
-        var difference = Math.abs((newRes.hz - oldRes.hz) /
-                                  ((oldRes.hz + newRes.hz) / 2) /
-                                  2);
+        var difference = Math.abs ((newRes.hz - oldRes.hz) /
+                                   ((oldRes.hz + newRes.hz) / 2) /
+                                   2);
         var isPositive = difference > significantDifference && change > 0;
         var isNegative = difference > significantDifference && change < 0;
 
@@ -233,27 +236,27 @@ module.exports = function benchmark(leftLib, rightLib, options, specs) {
                         colors && isNegative ? red :
                         identity;
 
-        table.push([name,
-                    format(oldRes),
-                    format(newRes),
-                    formatPct(false, difference * 100),
-                    highlight(formatPct(true, change * 100)),
-                    highlight(isPositive ? '✓' : isNegative ? '✗' : '')]);
+        table.push ([name,
+                     format (oldRes),
+                     format (newRes),
+                     formatPct (false, difference * 100),
+                     highlight (formatPct (true, change * 100)),
+                     highlight (isPositive ? '✓' : isNegative ? '✗' : '')]);
 
         completed += 1;
 
         if (completed === keys.length) {
-          process.stdout.write(table.toString() + '\n');
-          callback();
+          process.stdout.write (table.toString () + '\n');
+          callback ();
         } else {
-          runSpec(i + 1);
+          runSpec (i + 1);
         }
       });
 
-      suite.run({async: true});
+      suite.run ({async: true});
     }
 
-    runSpec(0);
+    runSpec (0);
 
   };
 
