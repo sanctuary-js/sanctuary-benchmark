@@ -62,7 +62,7 @@
 'use strict';
 
 var Suite = (require ('benchmark')).Suite;
-var Table = require ('cli-table2');
+var Table = require ('cli-table3');
 var micromatch = require ('micromatch');
 
 
