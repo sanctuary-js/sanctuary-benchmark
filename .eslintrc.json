@@ -9,7 +9,8 @@
     {
       "files": ["*.md"],
       "rules": {
-        "comma-dangle": ["error", "always-multiline"]
+        "comma-dangle": ["error", "always-multiline"],
+        "func-style": ["error", "declaration", {"allowArrowFunctions": true}]
       }
     }
   ]
