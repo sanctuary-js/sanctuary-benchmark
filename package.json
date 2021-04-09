@@ -23,7 +23,7 @@
   "bin": "./bin/sanctuary-benchmark",
   "dependencies": {
     "benchmark": "2.1.x",
-    "cli-table3": "0.5.x",
+    "cli-table3": "0.6.x",
     "micromatch": "3.0.x"
   },
   "devDependencies": {
