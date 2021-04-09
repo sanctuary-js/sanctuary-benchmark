@@ -71,8 +71,8 @@ test ('createRunner', function() {
   function fastLib() {}
 
   function slowLib() {
-    var theFuture = Date.now () + 10;
-    while (Date.now () !== theFuture) {}
+    var theFuture = Date.now () + 1;
+    while (Date.now () < theFuture) {}
   }
 
   var benchmark = [{}, function(lib) { lib (); }];
