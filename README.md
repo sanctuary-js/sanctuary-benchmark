@@ -10,29 +10,29 @@ standardized format for sharing.
 Create a file in the bench directory, for example `old-vs-new.js`:
 
 ```javascript
-const sb = require('sanctuary-benchmark');
+const sb = require ('sanctuary-benchmark');
 
 // Imagine these are libs. Normally they would be require()'d.
-const oldVersion = (f, xs) => xs.map(f);
+const oldVersion = (f, xs) => xs.map (f);
 const newVersion = (f, xs) => {
   const len = xs.length;
-  const out = new Array(len);
-  for (let idx = 0; idx < len; idx += 1) out[idx] = f(xs[idx]);
+  const out = new Array (len);
+  for (let idx = 0; idx < len; idx += 1) out[idx] = f (xs[idx]);
   return out;
 };
 
-const small = Array.from({length: 1}, (_, i) => i);
-const large = Array.from({length: 1000}, (_, i) => i);
+const small = Array.from ({length: 1}, (_, i) => i);
+const large = Array.from ({length: 1000}, (_, i) => i);
 
-module.exports = sb(oldVersion, newVersion, {}, {
-  'map/small': [{}, map => map(x => x + 1, small)],
-  'map/large': [{}, map => map(x => x + 1, large)],
+module.exports = sb (oldVersion, newVersion, {}, {
+  'map/small': [{}, map => map (x => x + 1, small)],
+  'map/large': [{}, map => map (x => x + 1, large)],
 });
 ```
 
 Run the sanctuary-benchmark command. Pass `--help` for options.
 
-```sh
+```console
 $ ./node_modules/.bin/sanctuary-benchmark
 ```
 
@@ -61,7 +61,7 @@ following columns:
 
 ## API Documentation
 
-<h4 name="benchmark"><code><a href="https://github.com/sanctuary-js/sanctuary-benchmark/blob/v1.0.0/index.js#L114">benchmark :: (a, b, Options, StrMap (Spec a b)) -⁠> Options -⁠> Undefined</a></code></h4>
+#### <a name="benchmark" href="https://github.com/sanctuary-js/sanctuary-benchmark/blob/v1.0.1/index.js#L115">`benchmark :: (a, b, Options, StrMap (Spec a b)) -⁠> Options -⁠> Undefined`</a>
 
 ```haskell
 Spec a b :: [Object, (a | b) -> Any]
