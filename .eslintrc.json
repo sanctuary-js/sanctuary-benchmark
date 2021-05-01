@@ -1,17 +1,5 @@
 {
   "root": true,
-  "extends": ["./node_modules/sanctuary-style/eslint-es3.json"],
-  "env": {"node": true},
-  "rules": {
-    "indent": ["off"]
-  },
-  "overrides": [
-    {
-      "files": ["*.md"],
-      "rules": {
-        "comma-dangle": ["error", "always-multiline"],
-        "func-style": ["error", "declaration", {"allowArrowFunctions": true}]
-      }
-    }
-  ]
+  "extends": ["./node_modules/sanctuary-style/eslint-es6.json"],
+  "env": {"node": true}
 }

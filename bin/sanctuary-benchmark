@@ -2,74 +2,72 @@
 
 'use strict';
 
-var fs = require ('fs');
+const fs = require ('fs');
 
-var path = require ('path');
+const path = require ('path');
 
 
-var dir = path.resolve (process.cwd (), 'bench');
+const dir = path.resolve (process.cwd (), 'bench');
 
-var help = 'Create a bench directory in this project to get started\n';
+let help = 'Create a bench directory in this project to get started\n';
 
-function printHelp() {
+const printHelp = () => {
   process.stdout.write (help);
   process.exit (0);
-}
+};
 
 if (!(fs.existsSync (dir))) printHelp ();
 
-var benchmarks = (
+const benchmarks = (
   fs.readdirSync (dir)
-  .filter (function(file) { return file.slice (-3) === '.js'; })
-  .map (function(file) { return file.slice (0, -3); })
+  .filter (file => file.endsWith ('.js'))
+  .map (file => file.slice (0, -'.js'.length))
 );
 
-/* eslint-disable max-len */
-help = 'There are no benchmarks in the bench directory\n'
-     + '\n'
-     + '  To create a benchmark, add a JavaScript file to the bench directory\n'
-     + '  and define benchmarks as described by the sanctuary-benchmark README.\n'
-     + '\n'
-     + 'Example\n'
-     + '\n'
-     + "  module.exports = require ('sanctuary-benchmark') (\n"
-     + "    require ('ramda'),\n"
-     + "    require ('sanctuary'),\n"
-     + "    {left: 'Ramda', right: 'Sanctuary'},\n"
-     + '    {map: lib => lib.map (x => x + 1) ([1, 2, 3])}\n'
-     + '  );\n';
-/* eslint-enable max-len */
+help = `There are no benchmarks in the bench directory
+
+  To create a benchmark, add a JavaScript file to the bench directory
+  and define benchmarks as described by the sanctuary-benchmark README.
+
+Example
+
+  module.exports = require ('sanctuary-benchmark') (
+    require ('ramda'),
+    require ('sanctuary'),
+    {left: 'Ramda', right: 'Sanctuary'},
+    {map: lib => lib.map (x => x + 1) ([1, 2, 3])}
+  );
+`;
 
 if (benchmarks.length === 0) printHelp ();
 
-/* eslint-disable max-len */
-help = 'Usage\n'
-     + '  $ sanctuary-benchmark [options]\n'
-     + '\n'
-     + 'Options\n'
-     + '  --benchmark <name>                 The name of the benchmark file to run\n'
-     + '  --colors, --no-colors              Enable or disable command line colors\n'
-     + '  --help                             Print help and do nothing else\n'
-     + '  --left-header <text>               Header describing the library on the left\n'
-     + '  --match <glob>                     Match suite names by given glob\n'
-     + '  --right-header <text>              Header describing the library on the right\n'
-     + '  --significant-difference <number>  Change required for highlight in results\n'
-     + '\n'
-     + 'Available benchmarks\n'
-     + '  ' + benchmarks[0] + ' (default)\n'
-     + '  ' + (benchmarks.slice (1)).join ('\n  ') + '\n';
-/* eslint-enable max-len */
+help = `Usage
+  $ sanctuary-benchmark [options]
 
-var argv = process.argv.slice (2);
+Options
+  --benchmark <name>                 The name of the benchmark file to run
+  --colors, --no-colors              Enable or disable command line colors
+  --help                             Print help and do nothing else
+  --left-header <text>               Header describing the library on the left
+  --match <glob>                     Match suite names by given glob
+  --right-header <text>              Header describing the library on the right
+  --significant-difference <number>  Change required for highlight in results
+
+Available benchmarks
+  ${benchmarks[0]} (default)
+  ${(benchmarks.slice (1)).join ('\n  ')}
+`;
+
+const argv = process.argv.slice (2);
 
 if (argv.indexOf ('--help') >= 0) printHelp ();
 
-var defaults = {
-  benchmark: benchmarks[0]
+const defaults = {
+  benchmark: benchmarks[0],
 };
 
-var options = argv.reduce (function(options, x, i, xs) {
-  return {
+const options = argv.reduce (
+  (options, x, i, xs) => ({
     /* eslint-disable key-spacing */
     benchmark:             x === '--benchmark'
                            ? benchmarks.indexOf (xs[i + 1]) < 0
@@ -90,11 +88,12 @@ var options = argv.reduce (function(options, x, i, xs) {
                            : options.rightHeader,
     significantDifference: x === '--significant-difference'
                            ? Number (xs[i + 1])
-                           : options.significantDifference
+                           : options.significantDifference,
     /* eslint-enable key-spacing */
-  };
-}, defaults);
+  }),
+  defaults
+);
 
-process.stdout.write ('Running benchmarks: ' + options.benchmark + '...\n\n');
+process.stdout.write (`Running benchmarks: ${options.benchmark}...\n\n`);
 
-require (dir + '/' + options.benchmark) (options);
+require (`${dir}/${options.benchmark}`) (options);
