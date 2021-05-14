@@ -127,8 +127,6 @@ function repeat(n, s) {
 //.              significantDifference :: Number? }
 //. ```
 //.
-//. </details>
-//.
 //. This module exports a single function. It takes four arguments and returns
 //. another function. The four arguments are:
 //.
