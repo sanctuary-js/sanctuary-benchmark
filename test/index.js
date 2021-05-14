@@ -104,7 +104,7 @@ test ('createRunner', function() {
     var run = createRunner (slowLib, fastLib, {}, spec);
     var assertFaster = expectResult (new RegExp (
       '^' +
-      T + ' mock[/](first|second) +' +
+      T + ' mock/(first|second) +' +
       T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
       T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
       T + ' \\d{3}[.]\\d% +' +
@@ -123,7 +123,7 @@ test ('createRunner', function() {
     var run = createRunner (fastLib, slowLib, {}, spec);
     var assertSlower = expectResult (new RegExp (
       '^' +
-      T + ' mock[/](first|second) +' +
+      T + ' mock/(first|second) +' +
       T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
       T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
       T + ' \\d{3}[.]\\d% +' +
