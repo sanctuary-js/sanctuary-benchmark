@@ -98,18 +98,18 @@ test ('createRunner', function() {
     ]);
   }
 
-  var T = '\\u001b\\[90m│\\u001b\\[39m';
+  var T = '\u001b\\[90m│\u001b\\[39m';
 
   test ('standard use: faster', function(done) {
     var run = createRunner (slowLib, fastLib, {}, spec);
     var assertFaster = expectResult (new RegExp (
       '^' +
       T + ' mock/(first|second) +' +
-      T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
-      T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
-      T + ' \\d{3}[.]\\d% +' +
-      T + ' \\u001b\\[32m[+]\\d+[.]\\d%\\u001b\\[0m +' +
-      T + ' \\u001b\\[32m✓\\u001b\\[0m ' + T +
+      T + ' [0-9,]+ Hz ±[0-9]+[.][0-9]+% [(]n [0-9]+[)] +' +
+      T + ' [0-9,]+ Hz ±[0-9]+[.][0-9]+% [(]n [0-9]+[)] +' +
+      T + ' [0-9]{3}[.][0-9]% +' +
+      T + ' \u001b\\[32m[+][0-9]+[.][0-9]%\u001b\\[0m +' +
+      T + ' \u001b\\[32m✓\u001b\\[0m ' + T +
       '$'
     ));
 
@@ -124,11 +124,11 @@ test ('createRunner', function() {
     var assertSlower = expectResult (new RegExp (
       '^' +
       T + ' mock/(first|second) +' +
-      T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
-      T + ' [\\d,]+ Hz ±\\d+[.]\\d+% \\(n \\d+\\) +' +
-      T + ' \\d{3}[.]\\d% +' +
-      T + ' \\u001b\\[31m-\\d+[.]\\d%\\u001b\\[0m +' +
-      T + ' \\u001b\\[31m✗\\u001b\\[0m ' + T +
+      T + ' [0-9,]+ Hz ±[0-9]+[.][0-9]+% [(]n [0-9]+[)] +' +
+      T + ' [0-9,]+ Hz ±[0-9]+[.][0-9]+% [(]n [0-9]+[)] +' +
+      T + ' [0-9]{3}[.][0-9]% +' +
+      T + ' \u001b\\[31m-[0-9]+[.][0-9]%\u001b\\[0m +' +
+      T + ' \u001b\\[31m✗\u001b\\[0m ' + T +
       '$'
     ));
 
