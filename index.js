@@ -61,54 +61,48 @@
 
 'use strict';
 
-var Suite = (require ('benchmark')).Suite;
-var Table = require ('cli-table3');
-var micromatch = require ('micromatch');
+const {Suite} = require ('benchmark');
+const Table = require ('cli-table3');
+const micromatch = require ('micromatch');
 
 
-//       formatPct :: (Boolean, Number) -> String
-function formatPct(sign, pct) {
-  var rendered = (sign ? pct : Math.abs (pct)).toLocaleString ('en', {
+//    formatPct :: (Boolean, Number) -> String
+const formatPct = (sign, pct) => `${
+  sign && pct >= 0 ? '+' : ''
+}${
+  (sign ? pct : Math.abs (pct))
+  .toLocaleString ('en', {
     minimumIntegerDigits: 3,
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
-    useGrouping: false
-  });
-  return (sign && pct >= 0 ? '+' + rendered : rendered) + '%';
-}
+    useGrouping: false,
+  })
+}%`;
 
-//       format :: BenchmarkResult -> String
-function format(res) {
-  return res.hz.toLocaleString ('en', {maximumFractionDigits: 0}) + ' Hz '
-       + '±' + res.stats.rme.toFixed (2) + '% '
-       + '(n ' + String (res.stats.sample.length) + ')';
-}
+//    format :: BenchmarkResult -> String
+const format = res => `${
+  res.hz.toLocaleString ('en', {maximumFractionDigits: 0})
+} Hz ±${
+  res.stats.rme.toFixed (2)
+}% (n ${
+  res.stats.sample.length
+})`;
 
-//       get :: (String, a, Any) -> a
-function get(key, fallback, x) {
-  var o = Object (x);
+//    get :: (String, a, Any) -> a
+const get = (key, fallback, x) => {
+  const o = Object (x);
   return typeof o[key] === typeof fallback ? o[key] : fallback;
-}
+};
 
-//       green :: String -> String
-function green(s) {
-  return '\u001B[32m' + s + '\u001B[0m';
-}
+//    green :: String -> String
+const green = s => (
+  `\u001B[32m${s}\u001B[0m`
+);
 
-//       identity :: a -> a
-function identity(x) {
-  return x;
-}
-
-//       red :: String -> String
-function red(s) {
-  return '\u001B[31m' + s + '\u001B[0m';
-}
-
-//       repeat :: (Number, String) -> String
-function repeat(n, s) {
-  return (new Array (n + 1)).join (s);
-}
+//    red :: String -> String
+const red = s => (
+  `\u001B[31m${s}\u001B[0m`
+);
 
 //. ## API Documentation
 
@@ -161,32 +155,32 @@ function repeat(n, s) {
 //. - `rightHeader` (`'right'`): Header describing the library on the right.
 //. - `significantDifference` (`0.1`): The resulting difference (between 0
 //.   and 1) required for the output table to draw attention to these results.
-module.exports = function benchmark(leftLib, rightLib, options, specs) {
-  var _callback = get ('callback', function() {}, options);
-  var _colors = get ('colors', true, options);
-  var _config = get ('config', {}, options);
-  var _leftHeader = get ('leftHeader', 'left', options);
-  var _match = get ('match', '**', options);
-  var _rightHeader = get ('rightHeader', 'right', options);
-  var _significantDifference = get ('significantDifference', 0.1, options);
+module.exports = (leftLib, rightLib, options, specs) => {
+  const _callback = get ('callback', () => {}, options);
+  const _colors = get ('colors', true, options);
+  const _config = get ('config', {}, options);
+  const _leftHeader = get ('leftHeader', 'left', options);
+  const _match = get ('match', '**', options);
+  const _rightHeader = get ('rightHeader', 'right', options);
+  const _significantDifference = get ('significantDifference', 0.1, options);
 
-  return function runBenchmarks(overrides) {
-    var callback = get ('callback', _callback, overrides);
-    var colors = get ('colors', _colors, overrides);
-    var config = get ('config', _config, overrides);
-    var leftHeader = get ('leftHeader', _leftHeader, overrides);
-    var match = get ('match', _match, overrides);
-    var rightHeader = get ('rightHeader', _rightHeader, overrides);
-    var significantDifference = get ('significantDifference',
-                                     _significantDifference,
-                                     overrides);
+  return overrides => {
+    const callback = get ('callback', _callback, overrides);
+    const colors = get ('colors', _colors, overrides);
+    const config = get ('config', _config, overrides);
+    const leftHeader = get ('leftHeader', _leftHeader, overrides);
+    const match = get ('match', _match, overrides);
+    const rightHeader = get ('rightHeader', _rightHeader, overrides);
+    const significantDifference = get ('significantDifference',
+                                       _significantDifference,
+                                       overrides);
 
-    var table = new Table ({
+    const table = new Table ({
       head: ['suite', leftHeader, rightHeader, 'diff', 'change', 'α'],
-      style: colors ? {} : {border: [], head: []}
+      style: colors ? {} : {border: [], head: []},
     });
 
-    var keys = (Object.keys (specs)).filter (micromatch.matcher (match));
+    const keys = (Object.keys (specs)).filter (micromatch.matcher (match));
 
     if (keys.length === 0) {
       process.stdout.write ('No benchmarks matched\n');
@@ -194,45 +188,41 @@ module.exports = function benchmark(leftLib, rightLib, options, specs) {
       return;
     }
 
-    var completed = 0;
+    let completed = 0;
 
     function runSpec(i) {
-      var name = keys[i];
-      var output = '# ' + String (i + 1) +
-                   '/' + String (keys.length) +
-                   ': ' +  name;
-
-      var padding = (process.stdout.getWindowSize ())[0] - output.length;
+      const name = keys[i];
+      const output = `# ${i + 1}/${keys.length}: ${name}`;
 
       process.stdout.write (
-        output + repeat (Math.max (padding, 0), ' ') + '\r'
+        `${output.padEnd ((process.stdout.getWindowSize ())[0])}\r`
       );
 
-      var suite = new Suite (name);
-      var spec = specs[name];
-      var left = spec[1];
-      var right = spec[spec.length - 1];
+      const suite = new Suite (name);
+      const spec = specs[name];
+      const left = spec[1];
+      const right = spec[spec.length - 1];
 
       suite.add ('left', Object.assign ({}, config, spec[0], {
-        fn: function() { left (leftLib, arguments); }
+        fn: (...args) => { left (leftLib, args); },
       }));
 
       suite.add ('right', Object.assign ({}, config, spec[0], {
-        fn: function() { right (rightLib, arguments); }
+        fn: (...args) => { right (rightLib, args); },
       }));
 
       suite.on ('complete', function() {
-        var oldRes = this[0], newRes = this[1];
-        var change = (newRes.hz - oldRes.hz) / oldRes.hz;
-        var difference = Math.abs ((newRes.hz - oldRes.hz) /
-                                   ((oldRes.hz + newRes.hz) / 2) /
-                                   2);
-        var isPositive = difference > significantDifference && change > 0;
-        var isNegative = difference > significantDifference && change < 0;
+        const {0: oldRes, 1: newRes} = this;
+        const change = (newRes.hz - oldRes.hz) / oldRes.hz;
+        const difference = Math.abs ((newRes.hz - oldRes.hz) /
+                                     ((oldRes.hz + newRes.hz) / 2) /
+                                     2);
+        const isPositive = difference > significantDifference && change > 0;
+        const isNegative = difference > significantDifference && change < 0;
 
-        var highlight = colors && isPositive ? green :
-                        colors && isNegative ? red :
-                        identity;
+        const highlight = colors && isPositive ? green :
+                          colors && isNegative ? red :
+                          s => s;
 
         table.push ([name,
                      format (oldRes),
