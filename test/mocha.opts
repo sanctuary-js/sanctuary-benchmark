@@ -1,4 +1,0 @@
---timeout 60000
---slow 120000
---ui tdd
---bail

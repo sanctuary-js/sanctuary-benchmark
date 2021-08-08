@@ -28,8 +28,14 @@
   },
   "devDependencies": {
     "intercept-stdout": "0.1.x",
-    "sanctuary-scripts": "4.0.x",
+    "sanctuary-scripts": "5.0.x",
     "sanctuary-show": "2.0.x",
     "sanctuary-type-classes": "12.1.x"
+  },
+  "mocha": {
+    "timeout": 60000,
+    "slow": 120000,
+    "ui": "tdd",
+    "bail": true
   }
 }
