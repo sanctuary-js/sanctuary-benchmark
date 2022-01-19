@@ -30,7 +30,7 @@
     "intercept-stdout": "0.1.x",
     "sanctuary-scripts": "5.0.x",
     "sanctuary-show": "2.0.x",
-    "sanctuary-type-classes": "12.1.x"
+    "sanctuary-type-classes": "13.0.x"
   },
   "mocha": {
     "timeout": 60000,
