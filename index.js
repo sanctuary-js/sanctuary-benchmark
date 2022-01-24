@@ -63,7 +63,7 @@
 
 const {Suite} = require ('benchmark');
 const Table = require ('cli-table3');
-const micromatch = require ('micromatch');
+const picomatch = require ('picomatch');
 
 
 //    formatPct :: (Boolean, Number) -> String
@@ -180,7 +180,8 @@ module.exports = (leftLib, rightLib, options, specs) => {
       style: colors ? {} : {border: [], head: []},
     });
 
-    const keys = (Object.keys (specs)).filter (micromatch.matcher (match));
+    const isMatch = picomatch (match);
+    const keys = (Object.keys (specs)).filter (key => isMatch (key));
 
     if (keys.length === 0) {
       process.stdout.write ('No benchmarks matched\n');

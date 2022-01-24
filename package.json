@@ -24,7 +24,7 @@
   "dependencies": {
     "benchmark": "2.1.x",
     "cli-table3": "0.6.x",
-    "micromatch": "3.0.x"
+    "picomatch": "2.3.x"
   },
   "devDependencies": {
     "intercept-stdout": "0.1.x",
