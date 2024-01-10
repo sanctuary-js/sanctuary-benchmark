@@ -1,12 +1,10 @@
-'use strict';
+import assert from 'assert';
 
-const assert = require ('assert');
+import intercept from 'intercept-stdout';
+import show from 'sanctuary-show';
+import Z from 'sanctuary-type-classes';
 
-const intercept = require ('intercept-stdout');
-const show = require ('sanctuary-show');
-const Z = require ('sanctuary-type-classes');
-
-const createRunner = require ('..');
+import createRunner from '../index.js';
 
 
 function eq(actual, expected) {
