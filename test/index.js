@@ -1,6 +1,7 @@
 import assert from 'assert';
 
 import intercept from 'intercept-stdout';
+import test from 'oletus';
 import show from 'sanctuary-show';
 import Z from 'sanctuary-type-classes';
 
@@ -13,40 +14,51 @@ function eq(actual, expected) {
   assert.strictEqual (Z.equals (actual, expected), true);
 }
 
-const expectOutput = expectations => {
+const executeRunner = (runner, options = {}) => new Promise ((res, rej) => {
+  runner ({
+    ...options,
+    callback: res,
+    config: {...options.config, onError: rej},
+  });
+});
+
+const expectOutput = (expectations, run) => new Promise ((res, rej) => {
   let idx = 0;
   const unhook = intercept (text => {
     (text.split ('\n')).forEach (line => {
       if (idx >= expectations.length) {
         unhook ();
-        throw new Error (
+        rej (new Error (
           'More lines than expected were printed:\n\n' +
           JSON.stringify (line)
-        );
+        ));
       }
       if (expectations[idx].test (line) === false) {
         unhook ();
-        throw new Error (
+        rej (new Error (
           'A printed line did not meet expectations:\n\n' +
           JSON.stringify (line) + '\n\n' +
           'It does not match expression:\n\n' +
           expectations[idx].toString ()
-        );
+        ));
       }
       idx += 1;
     });
   });
-  return () => {
-    unhook ();
+
+  run ()
+  .finally (unhook)
+  .then (() => {
     if (idx < expectations.length - 1) {
       throw new Error (
         `Expected ${expectations.length - idx} more lines to be printed.`
       );
     }
-  };
-};
+  })
+  .then (res, rej);
+});
 
-test ('createRunner', () => {
+await test ('createRunner', () => {
   eq (typeof createRunner, 'function');
   eq (createRunner.length, 4);
   eq (typeof createRunner ({}, {}, {}, {}), 'function');
@@ -79,7 +91,7 @@ test ('createRunner', () => {
     'fake/third': benchmark,
   };
 
-  const expectResult = resultLine => (
+  const expectResult = (resultLine, run) => (
     expectOutput ([
       /^# 1[/]2: mock[/]first *\r$/,
       /^# 2[/]2: mock[/]second *\r$/,
@@ -91,14 +103,13 @@ test ('createRunner', () => {
       resultLine,
       /^.*$/,
       /^$/,
-    ])
+    ], run)
   );
 
   const T = '\u001b\\[90m│\u001b\\[39m';
 
-  test ('standard use: faster', done => {
-    const run = createRunner (slowLib, fastLib, {}, spec);
-    const assertFaster = expectResult (new RegExp (
+  await test ('standard use: faster', () => expectResult (
+    new RegExp (
       '^' +
       T + ' mock/(first|second) +' +
       T + ' [0-9,]+ Hz ±[0-9]+[.][0-9]+% [(]n [0-9]+[)] +' +
@@ -107,17 +118,12 @@ test ('createRunner', () => {
       T + ' \u001b\\[32m[+][0-9]+[.][0-9]%\u001b\\[0m +' +
       T + ' \u001b\\[32m✓\u001b\\[0m ' + T +
       '$'
-    ));
+    ),
+    () => executeRunner (createRunner (slowLib, fastLib, {}, spec), options)
+  ));
 
-    run (Object.assign ({callback: () => {
-      assertFaster ();
-      done ();
-    }}, options));
-  });
-
-  test ('standard use: slower', done => {
-    const run = createRunner (fastLib, slowLib, {}, spec);
-    const assertSlower = expectResult (new RegExp (
+  await test ('standard use: slower', () => expectResult (
+    new RegExp (
       '^' +
       T + ' mock/(first|second) +' +
       T + ' [0-9,]+ Hz ±[0-9]+[.][0-9]+% [(]n [0-9]+[)] +' +
@@ -126,28 +132,14 @@ test ('createRunner', () => {
       T + ' \u001b\\[31m-[0-9]+[.][0-9]%\u001b\\[0m +' +
       T + ' \u001b\\[31m✗\u001b\\[0m ' + T +
       '$'
-    ));
-
-    run (Object.assign ({callback: () => {
-      assertSlower ();
-      done ();
-    }}, options));
-  });
+    ),
+    () => executeRunner (createRunner (fastLib, slowLib, {}, spec), options)
+  ));
 
 }
 
 
-test ('split runner syntax', done => {
-  const options = {
-    callback: done,
-    colors: false,
-    config: {
-      minSamples: 1,
-      onError: done,
-    },
-    significantDifference: 0,
-  };
-
+await test ('split runner syntax', () => {
   const left = {left: true};
   const right = {right: true};
 
@@ -157,31 +149,32 @@ test ('split runner syntax', done => {
            lib => { eq (lib, right); }],
   };
 
-  const run = createRunner (left, right, {}, spec);
-
-  run (options);
+  return executeRunner (createRunner (left, right, {}, spec), {
+    colors: false,
+    config: {minSamples: 1},
+    significantDifference: 0,
+  });
 });
 
-test ('no matches', () => {
-  const options = {
-    match: 'this will match nothing',
-  };
+await test ('no matches', async () => expectOutput (
+  [/^No benchmarks matched$/, /^$/],
+  () => {
+    const options = {
+      match: 'this will match nothing',
+    };
 
-  const spec = {
-    'this will not be matched': [{}, () => {}],
-  };
+    const spec = {
+      'this will not be matched': [{}, () => {}],
+    };
 
-  const run = createRunner ({}, {}, {}, spec);
-  const assert = expectOutput ([/^No benchmarks matched$/, /^$/]);
+    const run = createRunner ({}, {}, {}, spec);
 
-  run (options);
-  assert ();
-});
+    return executeRunner (run, options);
+  }
+));
 
-test ('no significant difference', done => {
-  const spec = {mock: [{}, () => {}]};
-  const run = createRunner ({}, {}, {}, spec);
-  const assert = expectOutput ([
+await test ('no significant difference', () => expectOutput (
+  [
     /^# 1[/]1: mock *\r$/,
     /^┌[─┬]+┐$/,
     /^│ suite +│ left +│ right +│ diff +│ change +│ α │$/,
@@ -189,31 +182,24 @@ test ('no significant difference', done => {
     /^│ mock +│(?: [\d,]+ Hz ±\d+[.]\d+% \(n \d+\) +│){2} \d{3}[.]\d% +│ [-+]\d+[.]\d% +│ {3}│$/,
     /^└[─┴]+┘$/,
     /^$/,
-  ]);
+  ],
+  () => {
+    const spec = {mock: [{}, () => {}]};
+    const run = createRunner ({}, {}, {}, spec);
 
+    const options = {
+      colors: false,
+      config: {minSamples: 1},
+      significantDifference: 100,
+    };
+
+    return executeRunner (run, options);
+  }
+));
+
+await test ('arguments', () => {
   const options = {
-    callback: () => {
-      assert ();
-      done ();
-    },
-    colors: false,
-    config: {
-      minSamples: 1,
-      onError: done,
-    },
-    significantDifference: 100,
-  };
-
-  run (options);
-});
-
-test ('arguments', done => {
-  const options = {
-    callback: done,
-    config: {
-      defer: true,
-      onError: done,
-    },
+    config: {defer: true},
   };
 
   const spec = {
@@ -231,5 +217,5 @@ test ('arguments', done => {
 
   const run = createRunner ({}, {}, null, spec);
 
-  run (options);
+  executeRunner (run, options);
 });
