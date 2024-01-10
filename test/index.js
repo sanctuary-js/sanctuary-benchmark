@@ -1,18 +1,10 @@
-import assert from 'assert';
+import {deepStrictEqual as eq} from 'assert';
 
 import intercept from 'intercept-stdout';
 import test from 'oletus';
-import show from 'sanctuary-show';
-import Z from 'sanctuary-type-classes';
 
 import createRunner from '../index.js';
 
-
-function eq(actual, expected) {
-  assert.strictEqual (arguments.length, eq.length);
-  assert.strictEqual (show (actual), show (expected));
-  assert.strictEqual (Z.equals (actual, expected), true);
-}
 
 const executeRunner = (runner, options = {}) => new Promise ((res, rej) => {
   runner ({

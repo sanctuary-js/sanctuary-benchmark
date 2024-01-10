@@ -28,9 +28,7 @@
   },
   "devDependencies": {
     "intercept-stdout": "0.1.x",
-    "sanctuary-scripts": "7.0.x",
-    "sanctuary-show": "3.0.x",
-    "sanctuary-type-classes": "13.0.x"
+    "sanctuary-scripts": "7.0.x"
   },
   "mocha": {
     "timeout": 60000,
