@@ -5,7 +5,10 @@
   "overrides": [
     {
       "files": ["test/**/*.js"],
-      "parserOptions": {"sourceType": "module"}
+      "parserOptions": {"ecmaVersion": 2022, "sourceType": "module"},
+      "rules": {
+        "max-len": ["off"]
+      }
     }
   ]
 }
